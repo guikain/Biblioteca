@@ -162,7 +162,7 @@ public class BibliotecaView {
             System.out.println("2. Livros mais populares");
             System.out.println("3. Usuarios com atraso");
             System.out.println("4. Usuarios com emprestimo");
-            System.out.println("6. Voltar");
+            System.out.println("5. Voltar");
             System.out.print("Escolha uma opção: ");
             int option = readInt();
             controller.setBibliotecaView(this);

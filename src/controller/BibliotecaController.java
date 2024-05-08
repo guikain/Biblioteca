@@ -42,7 +42,7 @@ public class BibliotecaController {
                 biblioteca.devolverLivro(bibliotecaView.IDLivro(), bibliotecaView.IDUser());
                 break;
             case 7:
-                // Lógica para mostrar relatórios
+                bibliotecaView.relatorios();
                 break;
             case 8:
                 System.out.println("Saindo...");
@@ -123,16 +123,17 @@ public class BibliotecaController {
     public void relatorioSelect(int opcao) {
         switch (opcao) {
             case 1:
-                //livros emprestados
+            System.out.println(biblioteca.relatorioLivrosEmprestados());
                 break;
             case 2:
-                //livros mais populares
+            System.out.println(biblioteca.relatorioLivrosPopulares());
                 break;
             case 3:
-                //usuarios com atraso
+            System.out.println(biblioteca.relatorioUsuariosComAtraso());
                 break;
             case 4:
-                //usuarios com emprestimo
+                System.out.println(biblioteca.relatorioUsuariosComEmprestimo());
+                break;
             case 5:
             System.out.println("Voltando...");
             bibliotecaView.menu();

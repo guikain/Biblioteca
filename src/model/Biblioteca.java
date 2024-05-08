@@ -3,7 +3,9 @@ package model;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import util.Util;
@@ -57,7 +59,7 @@ import util.Util;
         public String filtrarUserPorNome(String nome) {
 
             List<Usuario> Lusers = usuarios.stream()
-            .filter(u -> u.getNome() == nome)
+            .filter(u -> u.getNome().equals(nome))
             .collect(Collectors.toList());
 
             String Susers = "";
@@ -99,7 +101,7 @@ import util.Util;
         public String filtrarLivrosPorTitulo(String titulo) {
 
             List<Livro> Llivros = livros.stream()
-            .filter(l -> l.getTitulo() == titulo)
+            .filter(l -> l.getTitulo().equals(titulo))
             .collect(Collectors.toList());
 
             String Slivros = "";
@@ -117,7 +119,7 @@ import util.Util;
         public String filtrarLivrosPorAutor(String autor) {
 
             List<Livro> Llivros = livros.stream()
-            .filter(l -> l.getAutor() == autor)
+            .filter(l -> l.getAutor().equals(autor))
             .collect(Collectors.toList());
 
             String Slivros = "";
@@ -163,7 +165,7 @@ import util.Util;
         public String filtrarLivrosPorCategoria(String categoria) {
 
             List<Livro> Llivros = livros.stream()
-            .filter(l -> l.getCategoria() == categoria)
+            .filter(l -> l.getCategoria().equals(categoria))
             .collect(Collectors.toList());
 
             String Slivros = "";
@@ -177,6 +179,140 @@ import util.Util;
             }
             return Slivros;
         }
+
+        public List<Emprestimo> livrosEmprestados() {
+            List<Emprestimo> emprestimosAtivos = new ArrayList<>();
+            for (Usuario usuario : usuarios) {
+                emprestimosAtivos.addAll(usuario.getEmprestimo().stream()
+                        .filter(emprestimo -> emprestimo.getDataDevolucao() == null)
+                        .collect(Collectors.toList()));
+            }
+            return emprestimosAtivos;
+        }
+
+        public String relatorioLivrosEmprestados() {
+            StringBuilder relatorio = new StringBuilder();
+            List<Emprestimo> emprestimosAtivos = livrosEmprestados();
+            if (emprestimosAtivos.isEmpty()) {
+                relatorio.append("Nenhum livro emprestado atualmente.");
+            } else {
+                relatorio.append("Livros emprestados atualmente:\n");
+                for (Emprestimo emprestimo : emprestimosAtivos) {
+                    Livro livro = buscarLivroPorCodigo(Integer.parseInt(emprestimo.getLivroID()));
+                    Usuario usuario = buscarUsuarioPorCodigo(Integer.parseInt(emprestimo.getUsuarioID()));
+                    relatorio.append("\nLivro: ").append(livro.getTitulo());
+                    relatorio.append("\n   Usuario: ").append(usuario.getNome());
+                    relatorio.append("\n   Data de Empréstimo: ").append(emprestimo.getDataEmprestimo());
+                    relatorio.append("\n   Data de Devolução Prevista: ").append(emprestimo.getDataDevPrevista());
+                    relatorio.append("\n");
+                }
+            }
+            return relatorio.toString();
+        }
+
+        public String relatorioLivrosPopulares() {
+            StringBuilder relatorio = new StringBuilder();
+            List<Livro> livrosMaisPopulares = livrosPopulares();
+            if (livrosMaisPopulares == null) {
+                relatorio.append("Nenhum livro emprestado ainda.");
+            } else {
+                relatorio.append("Livros mais populares:\n");
+                for (Livro livro : livrosMaisPopulares) {
+                    relatorio.append("\nTitulo: ").append(livro.getTitulo());
+                    relatorio.append("\n   Autor: ").append(livro.getAutor());
+                    relatorio.append("\n   Categoria: ").append(livro.getCategoria());
+                    relatorio.append("\n   Data de Publicação: ").append(livro.getPublicacao());
+                    relatorio.append("\n   Quantidade de Exemplares Disponíveis: ").append(livro.getQtdExemplares());
+                    relatorio.append("\n");
+                }
+            }
+            return relatorio.toString();
+        }
+
+        public int contarEmprestimosAtrasadosPorUsuario(Usuario usuario) {
+            return (int) usuario.getEmprestimo().stream()
+                    .filter(e -> e.getDataDevolucao() != null && e.getDataDevolucao().isAfter(e.getDataDevPrevista()))
+                    .count();
+        }
+        
+        public String relatorioUsuariosComAtraso() {
+            StringBuilder relatorio = new StringBuilder();
+            List<Usuario> usuariosComAtraso = usuarios.stream()
+                    .filter(u -> contarEmprestimosAtrasadosPorUsuario(u) > 0)
+                    .collect(Collectors.toList());
+        
+            if (usuariosComAtraso.isEmpty()) {
+                relatorio.append("Nenhum usuário com atraso.");
+            } else {
+                relatorio.append("Usuários com atraso:\n");
+                for (Usuario usuario : usuariosComAtraso) {
+                    relatorio.append("\nNome: ").append(usuario.getNome());
+                    relatorio.append("\n   DDD: ").append(usuario.getDdd());
+                    relatorio.append("\n   Telefone: ").append(usuario.getTelefone());
+                    relatorio.append("\n   Endereço: ").append(usuario.getEndereco());
+                    relatorio.append("\n   Email: ").append(usuario.getEmail());
+                    relatorio.append("\n   Data de Nascimento: ").append(usuario.getDataNascimento());
+                    relatorio.append("\n   Quantidade de Exemplares Disponíveis: ").append(usuario.getVip());
+                    relatorio.append("\n");
+                }
+            }
+            return relatorio.toString();
+        }
+
+        public String relatorioUsuariosComEmprestimo() {
+            StringBuilder relatorio = new StringBuilder();
+            List<Usuario> usuariosComEmprestimo = UsuariosComEmprestimo();
+            if (usuariosComEmprestimo.isEmpty()) {
+                relatorio.append("Nenhum usuário com empréstimo ativo.");
+            } else {
+                relatorio.append("Usuários com empréstimo ativo:\n");
+                for (Usuario usuario : usuariosComEmprestimo) {
+                    relatorio.append("\nNome: ").append(usuario.getNome());
+                    relatorio.append("\n   DDD: ").append(usuario.getDdd());
+                    relatorio.append("\n   Telefone: ").append(usuario.getTelefone());
+                    relatorio.append("\n   Endereço: ").append(usuario.getEndereco());
+                    relatorio.append("\n   Email: ").append(usuario.getEmail());
+                    relatorio.append("\n   Data de Nascimento: ").append(usuario.getDataNascimento());
+                    relatorio.append("\n   Quantidade de Exemplares Disponíveis: ").append(usuario.getVip());
+                    relatorio.append("\n");
+                }
+            }
+            return relatorio.toString();
+        }
+
+
+        public List<Livro> livrosPopulares() {
+            Map<Livro, Integer> contagemEmprestimos = new HashMap<>();
+            for (Emprestimo emprestimo : livrosEmprestados()) {
+                Livro livro = buscarLivroPorCodigo(Integer.parseInt(emprestimo.getLivroID()));
+                contagemEmprestimos.put(livro, contagemEmprestimos.getOrDefault(livro, 0) + 1);
+            }
+            if (contagemEmprestimos.isEmpty()) {
+                return null;
+            } else {
+                int max = Collections.max(contagemEmprestimos.values());
+                return contagemEmprestimos.entrySet().stream()
+                        .filter(entry -> entry.getValue() == max)
+                        .map(Map.Entry::getKey)
+                        .collect(Collectors.toList());
+            }
+        }
+
+        public List<Usuario> UsuariosComAtraso() {
+            LocalDate hoje = LocalDate.now();
+            return usuarios.stream()
+                    .filter(usuario -> usuario.getEmprestimo().stream()
+                            .anyMatch(emprestimo -> emprestimo.getDataDevPrevista().isBefore(hoje) && emprestimo.getDataDevolucao() == null))
+                    .collect(Collectors.toList());
+        }
+
+        public List<Usuario> UsuariosComEmprestimo() {
+            return usuarios.stream()
+                    .filter(usuario -> usuario.getEmprestimo().stream()
+                            .anyMatch(emprestimo -> emprestimo.getDataDevolucao() == null))
+                    .collect(Collectors.toList());
+        }
+
         
 
         public void cadastrarUsuario(Usuario usuario){
