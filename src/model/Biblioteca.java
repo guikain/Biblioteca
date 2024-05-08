@@ -247,6 +247,7 @@ import util.Util;
                 relatorio.append("Usuários com atraso:\n");
                 for (Usuario usuario : usuariosComAtraso) {
                     relatorio.append("\nNome: ").append(usuario.getNome());
+                    relatorio.append("\n   ID: ").append(usuario.getId());
                     relatorio.append("\n   DDD: ").append(usuario.getDdd());
                     relatorio.append("\n   Telefone: ").append(usuario.getTelefone());
                     relatorio.append("\n   Endereço: ").append(usuario.getEndereco());
@@ -268,6 +269,7 @@ import util.Util;
                 relatorio.append("Usuários com empréstimo ativo:\n");
                 for (Usuario usuario : usuariosComEmprestimo) {
                     relatorio.append("\nNome: ").append(usuario.getNome());
+                    relatorio.append("\n   ID: ").append(usuario.getId());
                     relatorio.append("\n   DDD: ").append(usuario.getDdd());
                     relatorio.append("\n   Telefone: ").append(usuario.getTelefone());
                     relatorio.append("\n   Endereço: ").append(usuario.getEndereco());

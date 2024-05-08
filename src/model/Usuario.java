@@ -33,8 +33,8 @@ public class Usuario implements Comparable<Usuario>{
         return nome;
     }
 
-    public int getDdd() {
-        return id;
+    public String getDdd() {
+        return ddd;
     }
 
     public String getTelefone() {
