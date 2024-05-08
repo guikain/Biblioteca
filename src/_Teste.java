@@ -5,7 +5,7 @@ import model.Livro;
 import model.Usuario;
 
 
-public class Teste {
+public class _Teste {
     public static void main(String[] args) throws Exception {
         Biblioteca bibli = new Biblioteca();     
 
